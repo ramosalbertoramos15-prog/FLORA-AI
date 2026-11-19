@@ -1,11 +1,20 @@
-// Só disponibiliza valores PÚBLICOS necessários ao cliente Supabase.
-// Nunca devolver secret key, service_role ou OPENAI_API_KEY.
+'use strict';
+// Só devolve valores PÚBLICOS necessários ao cliente Supabase no navegador.
+// Nunca devolver chave secreta, service_role ou OPENAI_API_KEY.
+const { cfg, send, methodGuard } = require('./_lib/core');
+
 module.exports = function handler(req, res) {
-  res.setHeader('Cache-Control', 'no-store');
-  res.setHeader('X-Content-Type-Options', 'nosniff');
-  if (req.method !== 'GET') { res.setHeader('Allow', 'GET'); return res.status(405).json({ error: 'Método não permitido.' }); }
-  const url = process.env.SUPABASE_URL;
-  const publishableKey = process.env.SUPABASE_PUBLISHABLE_KEY || process.env.SUPABASE_ANON_KEY;
-  if (!url || !publishableKey) return res.status(200).json({ configured: false });
-  return res.status(200).json({ configured: true, url, publishableKey });
+  if (!methodGuard(req, res, ['GET'])) return;
+  const c = cfg();
+  const missing = [];
+  if (!c.url) missing.push('SUPABASE_URL');
+  if (!c.publishable) missing.push('SUPABASE_PUBLISHABLE_KEY');
+  if (missing.length) return send(res, 200, { configured: false, missing });
+  return send(res, 200, {
+    configured: true,
+    url: c.url,
+    publishableKey: c.publishable,
+    // Estado (sem valores secretos) para o painel de diagnóstico.
+    server: { ai: Boolean(c.openai), admin: Boolean(c.secret) }
+  });
 };

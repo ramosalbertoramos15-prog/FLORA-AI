@@ -1,93 +1,96 @@
-// FLORA AI — endpoint para testes beta privados na Vercel.
-// NUNCA coloques a chave OpenAI no frontend ou num repositório público.
-// A autenticação é validada no servidor via Supabase. Antes do lançamento
-// público: rate limiting persistente, quotas, monitorização e pagamentos verificados.
-const crypto = require('node:crypto');
+'use strict';
+// Chat e ferramentas de texto. Valida sessão, plano, quotas e limites ANTES de chamar a IA.
+const core = require('./_lib/core');
+const { send, methodGuard, parseBody, requireUser, effectivePlanId, getPlan, getSettings, checkQuota, reserveUsage, releaseUsage, finishUsage, db, enc, UUID_RE, cfg, timedFetch } = core;
 
-const TASKS = {
-  chat: 'És o assistente FLORA AI, criado para ajudar pessoas em Moçambique e outros países lusófonos. Responde em português claro, de forma útil, cuidadosa e concisa. Se a pergunta for noutra língua, podes responder nessa língua. Não inventes factos.',
-  carta: 'És um redator profissional. Cria uma carta de apresentação para candidatura a emprego a partir dos dados fornecidos. Usa português natural, estrutura adequada e tom profissional. Não inventes nomes de empresas, diplomas, experiências ou competências que não tenham sido fornecidos. Se faltarem dados, usa marcadores explícitos como [Nome da empresa]. Entrega apenas a carta.',
-  texto: 'És um redator e especialista em comunicação. Cria o texto pedido em português, com qualidade, boa legibilidade e adequação ao público indicado. Não inventes resultados, promoções ou garantias não fornecidas.',
-  traducao: 'És um tradutor profissional. Traduz o texto no idioma de destino indicado pelo utilizador, mantendo o significado, o tom e os nomes próprios. Entrega apenas a tradução; se não estiver claro o idioma de destino, pede-o.',
-  entrevista: 'És um orientador de carreira. Cria um exercício prático de preparação para entrevista adequado à vaga e aos dados fornecidos. Inclui perguntas prováveis, ideias de respostas adaptáveis e conselhos práticos. Não inventes experiência do candidato.'
+const BASE = 'Responde sempre no idioma do utilizador (por defeito português claro, adaptado a Moçambique). Sê útil, correto e conciso. Não inventes factos; se não souberes, diz. Valores monetários em metical (MT) quando fizer sentido.';
+const TOOLS = {
+  chat: `És a FLORA AI, assistente de inteligência artificial criada para ajudar pessoas em Moçambique e no mundo lusófono. ${BASE} Usa listas e passos quando ajudar.`,
+  carta: `És um redator profissional de candidaturas. Cria uma carta de apresentação a partir dos dados fornecidos, em português natural e tom profissional. Não inventes empresas, diplomas ou experiências; se faltarem dados usa marcadores como [Nome da empresa]. Entrega apenas a carta. ${BASE}`,
+  texto: `És um redator e especialista em comunicação. Cria o texto pedido com qualidade e adequação ao público indicado. Não inventes resultados, promoções ou garantias. ${BASE}`,
+  traducao: 'És um tradutor profissional. Traduz o texto para o idioma de destino indicado, mantendo significado, tom e nomes próprios. Entrega apenas a tradução.',
+  entrevista: `És um orientador de carreira. Cria um exercício de preparação para entrevista adequado à vaga: perguntas prováveis, ideias de resposta adaptáveis e conselhos práticos. Não inventes experiência do candidato. ${BASE}`,
+  cv: `És um especialista em currículos. Reescreve o texto do perfil profissional de forma clara, objetiva e profissional (3 a 5 linhas), sem inventar factos. Entrega apenas o texto melhorado. ${BASE}`
 };
 
-function safeEqual(a, b) {
-  const x = Buffer.from(a, 'utf8'); const y = Buffer.from(b, 'utf8');
-  return x.length === y.length && crypto.timingSafeEqual(x, y);
-}
-
-async function verifyAuthenticatedUser(req) {
-  const match = /^(?:Bearer)\s+([A-Za-z0-9._-]+)$/i.exec(req.headers?.authorization || '');
-  if (!match || match[1].length > 4096) return false;
-  const supabaseUrl = process.env.SUPABASE_URL;
-  const publishableKey = process.env.SUPABASE_PUBLISHABLE_KEY || process.env.SUPABASE_ANON_KEY;
-  if (!supabaseUrl || !publishableKey) return false;
-  let response;
-  try {
-    const controller = new AbortController();
-    const timeout = setTimeout(() => controller.abort(), 8500);
-    try {
-      response = await fetch(`${supabaseUrl.replace(/\/$/, '')}/auth/v1/user`, {
-        method: 'GET',
-        headers: { apikey: publishableKey, Authorization: `Bearer ${match[1]}` },
-        signal: controller.signal
-      });
-    } finally { clearTimeout(timeout); }
-  } catch { return false; }
-  if (!response.ok) return false;
-  const user = await response.json().catch(() => null);
-  return Boolean(user?.id);
-}
-
 module.exports = async function handler(req, res) {
-  res.setHeader('Cache-Control', 'no-store');
-  res.setHeader('X-Content-Type-Options', 'nosniff');
-  if (req.method !== 'POST') { res.setHeader('Allow', 'POST'); return res.status(405).json({ error: 'Método não permitido.' }); }
-  if (!process.env.OPENAI_API_KEY || !process.env.FLORA_AI_ACCESS_CODE || !process.env.SUPABASE_URL || !(process.env.SUPABASE_PUBLISHABLE_KEY || process.env.SUPABASE_ANON_KEY)) {
-    return res.status(503).json({ error: 'A IA ainda não está configurada. O criador de CV continua disponível gratuitamente.' });
+  if (!methodGuard(req, res, ['POST'])) return;
+  if (!core.isConfigured({ needAI: true })) return send(res, 503, { error: 'A IA ainda não está configurada no servidor.', code: 'not_configured' });
+  const ctx = await requireUser(req, res);
+  if (!ctx) return;
+  const { user, profile } = ctx;
+
+  const body = parseBody(req);
+  if (!body) return send(res, 400, { error: 'Pedido inválido.' });
+  const tool = typeof body.tool === 'string' ? body.tool : 'chat';
+  const message = typeof body.message === 'string' ? body.message.trim() : '';
+  const convId = body.conversation_id || null;
+  if (!Object.prototype.hasOwnProperty.call(TOOLS, tool)) return send(res, 400, { error: 'Ferramenta desconhecida.' });
+  if (message.length < 2 || message.length > 4000) return send(res, 400, { error: 'A mensagem deve ter entre 2 e 4000 caracteres.' });
+  if (convId && !UUID_RE.test(convId)) return send(res, 400, { error: 'Conversa inválida.' });
+
+  const [settings, plan] = await Promise.all([getSettings(), getPlan(effectivePlanId(profile))]);
+  const q = await checkQuota({ userId: user.id, kind: 'text', plan, settings });
+  if (!q.ok) return send(res, q.status, { error: q.error, code: q.code });
+
+  const persist = tool !== 'cv';
+  let conv = null;
+  let history = [];
+  if (persist && convId) {
+    const r = await db(`conversations?id=eq.${enc(convId)}&user_id=eq.${enc(user.id)}&select=id,tool,title&limit=1`);
+    conv = r.ok ? r.data?.[0] : null;
+    if (!conv) return send(res, 404, { error: 'Conversa não encontrada.' });
+    const h = await db(`messages?conversation_id=eq.${enc(conv.id)}&kind=eq.text&select=role,content&order=created_at.desc&limit=10`);
+    history = (h.ok ? h.data : []).reverse().map(m => ({ role: m.role, content: String(m.content).slice(0, 4000) }));
   }
-  const body = req.body || {};
-  if (typeof body !== 'object' || Array.isArray(body)) return res.status(400).json({ error: 'Pedido inválido.' });
-  const { type, prompt, accessCode } = body;
-  if (!(await verifyAuthenticatedUser(req))) {
-    return res.status(401).json({ error: 'Sessão inválida ou expirada. Entra novamente na tua conta.' });
-  }
-  if (typeof accessCode !== 'string' || !safeEqual(accessCode, process.env.FLORA_AI_ACCESS_CODE)) {
-    return res.status(403).json({ error: 'Código beta inválido. Contacta o administrador.' });
-  }
-  if (typeof type !== 'string' || !Object.prototype.hasOwnProperty.call(TASKS, type)) {
-    return res.status(400).json({ error: 'Ferramenta desconhecida.' });
-  }
-  if (typeof prompt !== 'string' || prompt.trim().length < 8 || prompt.length > 6500) {
-    return res.status(400).json({ error: 'A mensagem deve ter entre 8 e 6500 caracteres.' });
-  }
-  const controller = new AbortController();
-  const timeoutId = setTimeout(() => controller.abort(), 25000);
+  const activeTool = conv ? conv.tool : tool;
+
+  const usageId = await reserveUsage(user.id, 'text');
+  const c = cfg();
+  let out;
   try {
-    const response = await fetch('https://api.openai.com/v1/responses', {
+    const r = await timedFetch(`${c.openaiBase}/responses`, {
       method: 'POST',
-      signal: controller.signal,
-      headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${process.env.OPENAI_API_KEY}` },
+      headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${c.openai}` },
       body: JSON.stringify({
         model: process.env.OPENAI_MODEL || 'gpt-4.1-mini',
-        instructions: TASKS[type],
-        input: prompt.trim(),
-        max_output_tokens: 950,
+        instructions: TOOLS[activeTool],
+        input: [...history, { role: 'user', content: message }],
+        max_output_tokens: plan.max_output_tokens || 700,
         store: false
       })
-    });
-    const result = await response.json().catch(() => ({}));
-    if (!response.ok) {
-      console.error('OpenAI API error status:', response.status, 'error type:', result.error?.type || 'unknown');
-      if (response.status === 429) return res.status(429).json({ error: 'Limite temporário do serviço de IA. Tenta mais tarde.' });
-      return res.status(502).json({ error: 'A IA não conseguiu responder neste momento. Verifica a configuração e os créditos da API.' });
+    }, 50000);
+    const result = await r.json().catch(() => ({}));
+    if (!r.ok) {
+      console.error('OpenAI erro', r.status, result.error?.type || 'desconhecido');
+      await releaseUsage(usageId);
+      if (r.status === 429) return send(res, 429, { error: 'O serviço de IA está ocupado. Tenta novamente daqui a instantes.', code: 'upstream' });
+      return send(res, 502, { error: 'A IA não conseguiu responder agora. Tenta novamente.', code: 'upstream' });
     }
-    const text = (result.output || []).flatMap(item => item.content || []).filter(part => part.type === 'output_text').map(part => part.text || '').join('\n').trim();
-    if (!text) return res.status(502).json({ error: 'A IA respondeu sem texto utilizável.' });
-    return res.status(200).json({ text });
-  } catch (error) {
-    console.error('Request failed:', error.name || 'Error');
-    return res.status(error.name === 'AbortError' ? 504 : 502).json({ error: 'Falha na ligação ao serviço de IA. Tenta novamente.' });
-  } finally { clearTimeout(timeoutId); }
+    const text = (result.output || []).flatMap(i => i.content || []).filter(p => p.type === 'output_text').map(p => p.text || '').join('\n').trim();
+    if (!text) { await releaseUsage(usageId); return send(res, 502, { error: 'A IA respondeu sem texto. Tenta novamente.' }); }
+    out = { text, tin: result.usage?.input_tokens || 0, tout: result.usage?.output_tokens || 0 };
+  } catch (e) {
+    await releaseUsage(usageId);
+    return send(res, e.name === 'AbortError' ? 504 : 502, { error: 'Falha na ligação ao serviço de IA. Tenta novamente.' });
+  }
+  await finishUsage(usageId, out.tin, out.tout);
+
+  let msg = { id: null, role: 'assistant', kind: 'text', content: out.text, created_at: new Date().toISOString() };
+  if (persist) {
+    if (!conv) {
+      const title = message.replace(/\s+/g, ' ').slice(0, 60);
+      const cr = await db('conversations', { method: 'POST', body: { user_id: user.id, title, tool: activeTool }, prefer: 'return=representation' });
+      conv = cr.ok ? cr.data?.[0] : null;
+    }
+    if (conv) {
+      const ins = await db('messages', { method: 'POST', prefer: 'return=representation', body: [
+        { conversation_id: conv.id, user_id: user.id, role: 'user', content: message, created_at: new Date(Date.now() - 1000).toISOString() },
+        { conversation_id: conv.id, user_id: user.id, role: 'assistant', content: out.text }
+      ] });
+      if (ins.ok && ins.data?.[1]) msg = ins.data[1];
+      await db(`conversations?id=eq.${enc(conv.id)}`, { method: 'PATCH', body: { updated_at: new Date().toISOString() } });
+    }
+  }
+  return send(res, 200, { conversation_id: conv ? conv.id : null, title: conv?.title || null, message: msg, usage: { used: q.used + 1, limit: q.limit } });
 };
