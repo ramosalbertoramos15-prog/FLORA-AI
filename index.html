@@ -1,140 +1,70 @@
 <!doctype html>
 <html lang="pt">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <meta name="theme-color" content="#090b17" />
-  <meta name="description" content="FLORA AI — ferramentas inteligentes para estudar, trabalhar e criar. Currículos profissionais, textos, traduções e muito mais." />
-  <title>FLORA AI — A inteligência ao teu alcance</title>
-  <link rel="icon" href="favicon.svg" type="image/svg+xml" />
-  <link rel="stylesheet" href="styles.css" />
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#2f74c9">
+  <meta name="description" content="FLORA AI — chat com inteligência artificial, geração de imagens, criador de currículos, cartas, traduções e preparação para entrevistas. Em português, para Moçambique.">
+  <title>FLORA AI — Inteligência artificial em português</title>
+  <link rel="icon" href="favicon.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="assets/css/styles.css">
 </head>
 <body>
-  <div class="ambient ambient-a" aria-hidden="true"></div>
-  <div class="ambient ambient-b" aria-hidden="true"></div>
-  <header class="site-header">
-    <div class="container header-inner">
-      <a class="brand" href="#inicio" aria-label="FLORA AI, início"><span class="brand-mark">F<span class="mark-star">✦</span></span><span>FLORA <strong>AI</strong></span></a>
-      <nav class="desktop-nav" aria-label="Navegação principal">
-        <a href="#ferramentas">Ferramentas</a><a href="#como-funciona">Como funciona</a><a href="#planos">Planos</a><a href="#perguntas">Perguntas</a>
-      </nav>
-      <div class="header-account">
-        <span id="authUser" class="account-email" hidden></span>
-        <button id="authLogout" class="button button-small button-outline" type="button" hidden>Sair</button>
-        <button id="authOpen" class="button button-small button-primary" type="button">Entrar / Registar</button>
-      </div>
-    </div>
-  </header>
-
+  <header class="site-header"><div class="container">
+    <a class="brand" href="#inicio"><img src="favicon.svg" alt=""><span>FLORA <b>AI</b></span></a>
+    <nav class="nav" aria-label="Principal"><a href="#ferramentas">Ferramentas</a><a href="#planos">Planos</a><a href="#perguntas">Perguntas</a></nav>
+    <div class="head-actions"><button class="btn ghost sm" id="hLogin" type="button">Entrar</button><a class="btn sm" id="hApp" href="app.html">Começar grátis</a></div>
+  </div></header>
   <main>
-    <section id="inicio" class="hero container">
-      <div class="hero-copy">
-        <span class="eyebrow"><span class="status-dot"></span> VERSÃO BETA • CRIADO EM MOÇAMBIQUE</span>
-        <h1>A inteligência que faz as tuas <em>ideias acontecer.</em></h1>
-        <p>Currículos profissionais, cartas de apresentação, textos, traduções e muito mais. Tudo numa plataforma simples, em português e feita para ti.</p>
-        <div class="hero-actions"><a class="button button-primary" href="#workspace">Explorar ferramentas <span aria-hidden="true">↗</span></a><a class="button button-outline" href="#ferramentas">Ver funcionalidades <span aria-hidden="true">↓</span></a></div>
-        <div class="hero-trust"><span class="trust-icons" aria-hidden="true">✦ &nbsp;◈ &nbsp;✧</span><span>Cria currículos grátis. Para utilizar a IA beta, entra na tua conta.</span></div>
+    <section class="container hero" id="inicio">
+      <div>
+        <span class="eyebrow"><i></i> Feito em Moçambique, em português</span>
+        <h1>A inteligência artificial que <em>trabalha para ti.</em></h1>
+        <p class="lead">Conversa com a IA, cria imagens, faz o teu currículo em PDF, escreve cartas, traduz textos e prepara entrevistas. Tudo num só lugar, simples no telemóvel.</p>
+        <div class="hero-actions"><a class="btn" href="app.html">Criar conta grátis</a><a class="btn ghost" href="app.html#/cv">Fazer currículo sem conta</a></div>
+        <p class="small muted" style="margin-top:14px">Plano grátis para sempre. Sem cartão.</p>
       </div>
-      <div class="hero-visual" aria-label="Pré-visualização ilustrativa da interface FLORA AI">
-        <div class="visual-glow"></div>
-        <div class="mock-card mock-card-top"><span class="small-icon purple">✦</span><div><strong>FLORA AI</strong><small>O teu espaço inteligente</small></div><span class="online-pill">● Beta</span></div>
-        <div class="mock-chat"><div class="chat-bubble bubble-user">Ajuda-me a criar um currículo profissional.</div><div class="chat-bubble bubble-ai"><span class="mini-spark">✦</span> Claro! Vamos organizar a tua experiência, competências e formação num currículo com apresentação profissional.<span class="typing-lines" aria-hidden="true"><i></i><i></i><i></i></span></div></div>
-        <div class="mock-floating mock-floating-left"><span>◈</span><div><strong>6 ferramentas</strong><small>Uma só plataforma</small></div></div>
-        <div class="mock-floating mock-floating-right"><span>↗</span><div><strong>Pronto para criar</strong><small>Mais produtividade</small></div></div>
+      <div class="hero-visual" aria-hidden="true"><div class="mock">
+        <div class="bub u">Cria uma imagem de uma loja de capulanas em Maputo</div>
+        <div class="bub a"><div class="mock-img">Imagem criada pela IA</div></div>
+        <div class="bub u">Agora escreve um anúncio curto para a loja</div>
+        <div class="bub a">Descobre as cores de Moçambique: capulanas modernas, feitas com carinho. Passa pela nossa loja! 🌺</div>
+      </div></div>
+    </section>
+
+    <section class="container section" id="ferramentas">
+      <div class="section-head"><span class="kicker">O QUE PODES FAZER</span><h2>Tudo o que precisas, num só lugar</h2><p class="muted">Ferramentas reais, pensadas para estudo, trabalho e negócio.</p></div>
+      <div class="grid3">
+        <div class="feat"><div class="ic">💬</div><h3>Chat com IA</h3><p>Faz perguntas, pede ideias e continua a conversa, como num assistente moderno.</p></div>
+        <div class="feat"><div class="ic">🎨</div><h3>Geração de imagens</h3><p>Descreve o que imaginas e a IA cria a imagem. Guardada na tua conta.</p></div>
+        <div class="feat"><div class="ic">📄</div><h3>Currículos em PDF</h3><p>4 modelos elegantes, pré-visualização A4 e exportação para PDF. Grátis.</p></div>
+        <div class="feat"><div class="ic">✉️</div><h3>Cartas de apresentação</h3><p>Cartas claras e adaptadas à vaga a que te candidatas.</p></div>
+        <div class="feat"><div class="ic">🌍</div><h3>Tradução</h3><p>Traduz para inglês, francês, espanhol, suaíli e mais, com tom natural.</p></div>
+        <div class="feat"><div class="ic">🎤</div><h3>Preparar entrevistas</h3><p>Perguntas prováveis e ideias de resposta para a tua vaga.</p></div>
       </div>
     </section>
 
-    <section class="stats-strip container" aria-label="Destaques"><div><strong>06</strong><span>Ferramentas num lugar</span></div><div><strong>24/7</strong><span>Disponível online*</span></div><div><strong>PT</strong><span>Pensado para português</span></div><div><strong>100%</strong><span>Compatível com telemóvel</span></div></section>
-
-    <section id="ferramentas" class="container section">
-      <div class="section-head"><span class="section-kicker">O QUE PODES FAZER</span><h2>Uma plataforma. <span>Várias possibilidades.</span></h2><p>Ferramentas para tarefas de estudo, trabalho e negócios. A criação de currículos funciona desde já; as restantes ferramentas usam IA após configuração.</p></div>
-      <div class="feature-grid">
-        <article class="feature-card featured"><div class="feature-icon purple">✦</div><span class="feature-label">ASSISTENTE</span><h3>Chat com IA</h3><p>Esclarece dúvidas, organiza ideias e recebe sugestões para o teu dia a dia.</p><a href="#workspace" data-open-tool="chat">Experimentar <span>↗</span></a></article>
-        <article class="feature-card"><div class="feature-icon blue">▤</div><span class="feature-label">CARREIRA</span><h3>Criador de CV</h3><p>Cria um currículo bonito, com visualização imediata e exportação para PDF.</p><a href="#workspace" data-open-tool="cv">Criar currículo <span>↗</span></a></article>
-        <article class="feature-card"><div class="feature-icon pink">✉</div><span class="feature-label">CARREIRA</span><h3>Cartas de apresentação</h3><p>Escreve cartas claras e adaptadas à vaga que procuras.</p><a href="#workspace" data-open-tool="carta">Criar carta <span>↗</span></a></article>
-        <article class="feature-card"><div class="feature-icon amber">✎</div><span class="feature-label">CRIATIVIDADE</span><h3>Criador de textos</h3><p>Gera ideias para publicações, descrições, propostas e mensagens.</p><a href="#workspace" data-open-tool="texto">Criar texto <span>↗</span></a></article>
-        <article class="feature-card"><div class="feature-icon teal">文</div><span class="feature-label">IDIOMAS</span><h3>Tradução inteligente</h3><p>Traduz mensagens e documentos curtos com linguagem natural.</p><a href="#workspace" data-open-tool="traducao">Traduzir <span>↗</span></a></article>
-        <article class="feature-card"><div class="feature-icon green">◎</div><span class="feature-label">PREPARAÇÃO</span><h3>Entrevistas de emprego</h3><p>Treina respostas e prepara-te para oportunidades profissionais.</p><a href="#workspace" data-open-tool="entrevista">Preparar-me <span>↗</span></a></article>
+    <section class="container section" id="planos">
+      <div class="section-head"><span class="kicker">PLANOS</span><h2>Grátis ou Premium</h2><p class="muted">Começa sem pagar. Passa a Premium quando precisares de mais.</p></div>
+      <div class="plans" id="planBox">
+        <div class="plan"><span class="badge">Inicial</span><h3>Grátis</h3><div class="price">0 MT <small>/ sempre</small></div><ul><li>Chat com IA (15 mensagens por dia)</li><li>1 imagem por dia</li><li>Criador de currículos com PDF</li><li>Cartas, textos, traduções e entrevistas</li></ul><a class="btn ghost" href="app.html">Começar grátis</a></div>
+        <div class="plan pop"><span class="badge">Recomendado</span><h3>Premium</h3><div class="price">150 MT <small>/ 30 dias</small></div><ul><li>150 mensagens por dia</li><li>10 imagens por dia</li><li>Respostas mais longas e detalhadas</li><li>Histórico completo e suporte prioritário</li></ul><a class="btn" href="app.html#/planos">Ver Premium</a></div>
       </div>
+      <p class="small muted" style="text-align:center;margin-top:14px">Pagamento por M-Pesa, e-Mola, Millennium BIM, PayPal ou Binance, com confirmação do administrador.</p>
     </section>
 
-    <section id="workspace" class="container section workspace-section">
-      <div class="section-head compact"><span class="section-kicker">TESTA A PLATAFORMA</span><h2>O teu estúdio de <span>criação.</span></h2><p>Cria currículos gratuitamente, sem conta. Para testar as ferramentas de IA, entra na tua conta e usa o código beta.</p></div>
-      <div class="workspace-shell">
-        <div class="workspace-nav"><div class="workspace-title"><span class="logo-dot">✦</span> Ferramentas <span class="workspace-version">BETA</span></div>
-          <div class="tool-list" role="group" aria-label="Selecionar ferramenta">
-            <button class="tool-button active" data-tool="cv"><span>▤</span> Currículo profissional <small>Grátis</small></button>
-            <button class="tool-button" data-tool="chat"><span>✦</span> Chat IA</button>
-            <button class="tool-button" data-tool="carta"><span>✉</span> Carta de apresentação</button>
-            <button class="tool-button" data-tool="texto"><span>✎</span> Criar textos</button>
-            <button class="tool-button" data-tool="traducao"><span>文</span> Tradução</button>
-            <button class="tool-button" data-tool="entrevista"><span>◎</span> Preparar entrevistas</button>
-          </div>
-          <div class="beta-side-note"><span>ⓘ</span><p>As ferramentas com IA exigem uma conta confirmada e um código de acesso beta, fornecido pelo administrador.</p></div>
-        </div>
-        <div class="workspace-main">
-          <div id="cvTool" class="tool-panel">
-            <div class="panel-header"><div><span class="small-tag">GRÁTIS E FUNCIONAL</span><h3>Cria o teu currículo</h3><p>Preenche os campos, vê o resultado e guarda como PDF no teu dispositivo.</p></div><span class="panel-header-icon">▤</span></div>
-            <div class="cv-layout"><form id="cvForm" class="cv-form">
-              <div class="form-grid"><label>Nome completo<input id="cvNome" maxlength="100" placeholder="Ex.: Ana Manuel" autocomplete="name" /></label><label>Área profissional<input id="cvCargo" maxlength="100" placeholder="Ex.: Assistente administrativa" /></label></div>
-              <div class="form-grid"><label>Email<input id="cvEmail" maxlength="130" type="email" placeholder="exemplo@email.com" autocomplete="email" /></label><label>Telefone<input id="cvTelefone" maxlength="40" placeholder="+258 ..." autocomplete="tel" /></label></div>
-              <label>Localização<input id="cvLocal" maxlength="100" placeholder="Ex.: Maputo, Moçambique" /></label>
-              <label>Perfil profissional<textarea id="cvResumo" rows="3" maxlength="900" placeholder="Resume as tuas principais competências e objetivos profissionais."></textarea></label>
-              <label>Experiência profissional <small>(uma por linha)</small><textarea id="cvExperiencia" rows="3" maxlength="1600" placeholder="2024–2026 — Assistente de loja, Empresa X"></textarea></label>
-              <label>Formação académica <small>(uma por linha)</small><textarea id="cvFormacao" rows="3" maxlength="1400" placeholder="2023 — Técnico Médio em Agricultura"></textarea></label>
-              <label>Competências <small>(separadas por vírgula)</small><textarea id="cvCompetencias" rows="2" maxlength="900" placeholder="Comunicação, Microsoft Office, Trabalho em equipa"></textarea></label>
-              <div class="cv-actions"><button type="button" class="button button-primary" id="printCv">Guardar PDF <span>↗</span></button><button type="reset" class="button button-outline button-muted" id="clearCv">Limpar</button></div>
-              <p class="form-footnote">🔒 Os dados do currículo não são enviados ao servidor. O PDF é guardado através da função de impressão do navegador.</p>
-            </form>
-            <div class="cv-preview-wrap"><div class="preview-title"><span>PRÉ-VISUALIZAÇÃO</span><span>FORMATO A4</span></div><article id="cvPrintArea" class="cv-sheet" aria-label="Pré-visualização do currículo"><div class="cv-sheet-header"><h2 id="pvNome">O TEU NOME</h2><p id="pvCargo">A tua profissão</p><div id="pvContacts" class="cv-contact-line">Email • Telefone • Localização</div></div><section class="cv-sheet-section"><h4>PERFIL PROFISSIONAL</h4><p id="pvResumo">Escreve aqui um pequeno resumo sobre quem és e o que procuras profissionalmente.</p></section><section class="cv-sheet-section"><h4>EXPERIÊNCIA</h4><ul id="pvExperiencia"><li>Adiciona as tuas experiências profissionais.</li></ul></section><section class="cv-sheet-section"><h4>FORMAÇÃO</h4><ul id="pvFormacao"><li>Indica a tua formação académica.</li></ul></section><section class="cv-sheet-section"><h4>COMPETÊNCIAS</h4><p id="pvCompetencias">Lista as tuas principais competências.</p></section></article></div></div>
-          </div>
-          <div id="aiTool" class="tool-panel" hidden>
-            <div class="panel-header"><div><span class="small-tag">INTELIGÊNCIA ARTIFICIAL • CONTA + BETA</span><h3 id="aiTitle">Chat com IA</h3><p id="aiDescription">Faz uma pergunta à tua assistente inteligente.</p></div><span class="panel-header-icon" id="aiIcon">✦</span></div>
-            <div class="ai-form">
-              <div class="ai-login-notice" id="aiLoginNotice"><span>🔐 Faz login para utilizar as ferramentas de IA. O currículo continua gratuito.</span><button type="button" id="aiLoginButton" class="button button-small button-outline">Entrar ou criar conta</button></div>
-              <label for="aiPrompt" id="aiPromptLabel">O que precisas?</label>
-              <textarea id="aiPrompt" rows="7" maxlength="6500" placeholder="Escreve aqui a tua mensagem..."></textarea>
-              <div class="code-row"><label for="betaCode">Código privado de acesso beta <span class="help-icon" title="O administrador define este código no servidor.">ⓘ</span></label><input id="betaCode" type="password" autocomplete="off" placeholder="Introduz o código fornecido pelo administrador" /></div>
-              <button id="generateButton" class="button button-primary" type="button">Gerar com IA <span aria-hidden="true">✦</span></button>
-              <p class="form-footnote">Não coloques palavras-passe ou dados bancários. As solicitações são enviadas ao serviço de IA quando estiver configurado.</p>
-              <div id="aiStatus" class="ai-status" role="status" aria-live="polite"></div>
-              <div id="aiResultBox" class="ai-result" hidden><div class="result-header"><strong>✦ Resultado</strong><button id="copyResult" class="text-button" type="button">Copiar texto ↗</button></div><div id="aiResult" class="ai-result-text"></div></div>
-            </div>
-          </div>
-        </div>
-      </div>
+    <section class="container section" id="perguntas" style="max-width:780px">
+      <div class="section-head"><span class="kicker">DÚVIDAS</span><h2>Perguntas frequentes</h2></div>
+      <details class="faq"><summary>Preciso de pagar para usar?</summary><p>Não. O plano Grátis é gratuito para sempre e inclui o criador de currículos, o chat e as ferramentas com limites diários.</p></details>
+      <details class="faq"><summary>Preciso de conta para fazer o currículo?</summary><p>Não. Podes criar e guardar o PDF sem conta. A conta serve para guardar currículos online e usar a IA.</p></details>
+      <details class="faq"><summary>Como pago o Premium?</summary><p>Escolhes o método (M-Pesa, e-Mola, BIM, PayPal ou Binance), pagas o valor indicado e envias o ID da transação na app. Depois de o administrador confirmar, o plano é ativado.</p></details>
+      <details class="faq"><summary>As minhas conversas são privadas?</summary><p>Ficam guardadas na tua conta e só tu as vês. Os pedidos são processados por um serviço de IA externo. Lê a <a href="privacidade.html">Política de Privacidade</a>.</p></details>
+      <details class="faq"><summary>A IA pode errar?</summary><p>Sim. Confirma sempre informações importantes (saúde, leis, dinheiro) antes de decidir.</p></details>
     </section>
 
-    <section id="como-funciona" class="container section how-section"><div class="section-head"><span class="section-kicker">SIMPLES DE USAR</span><h2>Começa em <span>3 passos.</span></h2></div><div class="steps"><article><span class="step-num">01</span><h3>Escolhe a ferramenta</h3><p>Abre o estúdio e seleciona o que queres criar.</p></article><article><span class="step-num">02</span><h3>Adiciona as informações</h3><p>Preenche os campos ou escreve o teu pedido.</p></article><article><span class="step-num">03</span><h3>Guarda o resultado</h3><p>Descarrega o currículo como PDF ou copia o texto gerado.</p></article></div></section>
-
-    <section id="planos" class="container section"><div class="section-head"><span class="section-kicker">PREÇOS PROPOSTOS</span><h2>Um plano para <span>cada objetivo.</span></h2><p>Estes preços são ilustrativos. O sistema de contas está disponível após configuração. Cobranças e assinaturas ainda não estão disponíveis.</p></div><div class="pricing-grid">
-      <article class="plan-card"><div class="plan-label">INICIAL</div><h3>Grátis</h3><p>Para conhecer a plataforma.</p><div class="price">0 MT <span>/ sempre</span></div><ul><li>✓ Criador de currículos</li><li>✓ Pré-visualização</li><li>✓ Guardar CV em PDF</li></ul><a href="#workspace" data-open-tool="cv" class="button button-outline">Começar agora</a></article>
-      <article class="plan-card popular"><span class="popular-badge">PROPOSTA MAIS POPULAR</span><div class="plan-label">PROFISSIONAL</div><h3>Premium</h3><p>Para produzir com mais facilidade.</p><div class="price">150 MT <span>/ mês</span></div><ul><li>✓ Ferramentas de escrita com IA</li><li>✓ Tradução e assistente IA</li><li>✓ Limites de utilização definidos</li></ul><button type="button" class="button button-primary" disabled>Pagamento em preparação</button></article>
-      <article class="plan-card"><div class="plan-label">AVANÇADO</div><h3>VIP</h3><p>Para quem precisa de mais recursos.</p><div class="price">300 MT <span>/ mês</span></div><ul><li>✓ Tudo do Premium</li><li>✓ Mais pedidos mensais</li><li>✓ Prioridade em novidades</li></ul><button type="button" class="button button-outline" disabled>Pagamento em preparação</button></article>
-    </div><p class="pricing-warning">* O registo gratuito não ativa qualquer plano pago. Não existem cobranças automáticas nem subscrições ativas nesta versão. Nunca efetues pagamentos com base apenas nesta página.</p></section>
-
-    <section id="perguntas" class="container section faq-section"><div class="section-head"><span class="section-kicker">DÚVIDAS FREQUENTES</span><h2>Perguntas <span>frequentes.</span></h2></div><div class="faq-list"><details><summary>O FLORA AI já está completamente funcional?</summary><p>Esta é uma versão inicial. O criador de currículos e a exportação para PDF funcionam diretamente no navegador. Para usar IA é necessário registar uma conta, confirmar o email (se ativado) e obter o código beta do administrador. A IA também tem de estar configurada no servidor.</p></details><details><summary>Preciso de pagar para fazer um currículo?</summary><p>Não. Nesta versão, criar e guardar o currículo em PDF é gratuito.</p></details><details><summary>Como funciona a inteligência artificial?</summary><p>A plataforma pode comunicar com um serviço de IA através de uma função segura no servidor. O administrador precisa de configurar a chave da API, o serviço de login e o código beta. A utilização de IA tem custos.</p></details><details><summary>Como crio uma conta?</summary><p>Toca em «Entrar / Registar», escolhe «Criar conta» e introduz o teu email e uma palavra-passe. Poderás ter de confirmar o email antes de entrar.</p></details><details><summary>Posso pagar por M-Pesa ou e-Mola?</summary><p>Os pagamentos ainda não estão integrados. A implementação exige configurar um fornecedor de pagamentos, contas de cliente e verificação de cada transação.</p></details></div></section>
-
-    <section class="container final-cta"><div><span class="section-kicker">A TUA PRÓXIMA IDEIA COMEÇA AQUI</span><h2>Cria algo <em>extraordinário.</em></h2><p>Experimenta o editor de currículos e conhece a primeira versão do FLORA AI.</p></div><a href="#workspace" class="button button-primary">Começar gratuitamente ↗</a></section>
+    <section class="container"><div class="cta"><div><h2>Pronto para começar?</h2><p>Cria a tua conta grátis em menos de um minuto.</p></div><a class="btn" href="app.html">Criar conta grátis</a></div></section>
   </main>
-  <footer class="footer container"><a class="brand" href="#inicio"><span class="brand-mark">F<span class="mark-star">✦</span></span><span>FLORA <strong>AI</strong></span></a><p>© <span id="year"></span> FLORA AI. Projeto independente. Versão beta para testes.</p><a href="#perguntas">Privacidade e perguntas</a></footer>
-  <dialog id="authDialog" class="auth-dialog" aria-labelledby="authDialogTitle">
-    <div class="auth-shell">
-      <div class="auth-top"><div class="auth-mini-logo" aria-hidden="true">F<span>✦</span></div><button type="button" class="auth-close" id="authClose" aria-label="Fechar">✕</button></div>
-      <div class="auth-head"><span class="section-kicker">A TUA CONTA FLORA AI</span><h2 id="authDialogTitle">Bem-vindo de volta</h2><p id="authDescription">Entra para aceder ao teu espaço e às ferramentas de IA beta.</p></div>
-      <form id="authForm" class="auth-form" novalidate>
-        <label id="authEmailField">Email <input type="email" name="email" id="authEmail" autocomplete="email" maxlength="254" placeholder="teu@email.com" required></label>
-        <label id="authPasswordField">Palavra-passe <input type="password" name="password" id="authPassword" autocomplete="current-password" minlength="8" maxlength="128" placeholder="Mínimo 8 caracteres" required></label>
-        <label id="authConfirmField" hidden>Confirmar palavra-passe <input type="password" name="confirm" id="authConfirm" autocomplete="new-password" minlength="8" maxlength="128" placeholder="Repete a palavra-passe"></label>
-        <div id="authLinks" class="auth-links"><button type="button" class="text-button" id="authForgot">Esqueci a palavra-passe</button></div>
-        <p id="authMessage" class="auth-message" role="status" aria-live="polite"></p>
-        <button type="submit" id="authSubmit" class="button button-primary auth-submit">Entrar na minha conta <span aria-hidden="true">↗</span></button>
-      </form>
-      <div id="authSwitchWrap" class="auth-switch">Ainda não tens conta? <button type="button" id="authSwitch" class="text-button">Criar conta grátis</button></div>
-      <p class="auth-fine-print">Não pagues para criar uma conta. A FLORA AI está em fase beta e as ferramentas com IA exigem autorização do administrador.</p>
-    </div>
-  </dialog>
-  <script src="app.js" defer></script>
-  <script type="module" src="auth.js"></script>
+  <footer class="site-footer"><div class="container"><span>© <span id="yr"></span> FLORA AI</span><nav><a href="termos.html">Termos</a><a href="privacidade.html">Privacidade</a><a href="ajuda.html">Ajuda e contacto</a></nav></div></footer>
+  <script type="module" src="assets/js/landing.js"></script>
 </body>
 </html>

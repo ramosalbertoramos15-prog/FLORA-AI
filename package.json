@@ -1,7 +1,8 @@
 {
-  "name": "flora-ai-mvp",
-  "version": "0.1.0",
+  "name": "flora-ai",
+  "version": "3.0.0",
   "private": true,
-  "description": "Protótipo FLORA AI: currículo PDF + ferramentas de IA para beta privada na Vercel",
-  "license": "UNLICENSED"
+  "description": "FLORA AI — plataforma de inteligência artificial em português",
+  "license": "UNLICENSED",
+  "engines": { "node": ">=20" }
 }

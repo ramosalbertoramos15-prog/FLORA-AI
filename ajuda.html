@@ -1,0 +1,29 @@
+<!doctype html>
+<html lang="pt"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1"><meta name="theme-color" content="#2f74c9">
+<title>Ajuda e contacto — FLORA AI</title><link rel="icon" href="favicon.svg" type="image/svg+xml"><link rel="stylesheet" href="assets/css/styles.css"></head>
+<body><header class="site-header"><div class="container"><a class="brand" href="index.html"><img src="favicon.svg" alt=""><span>FLORA <b>AI</b></span></a><div class="head-actions"><a class="btn sm" href="app.html">Abrir a app</a></div></div></header>
+<main class="legal">
+<h1>Ajuda e contacto</h1>
+<div id="contact" class="card" style="margin:18px 0"><p class="muted" style="margin:0">A carregar contactos…</p></div>
+<h2>Perguntas rápidas</h2>
+<details class="faq"><summary>Não recebi o email de confirmação</summary><p>Verifica a pasta de spam/lixo. Espera alguns minutos e, se não chegar, tenta «Esqueci a palavra-passe» ou contacta o suporte.</p></details>
+<details class="faq"><summary>Paguei mas o Premium não foi ativado</summary><p>Em «Planos», confirma que o pagamento aparece como «Em análise». O administrador confirma manualmente. Se passaram muitas horas, contacta o suporte com o ID da transação.</p></details>
+<details class="faq"><summary>Atingi o limite diário</summary><p>Os limites repõem-se à meia-noite (hora de Maputo). O plano Premium tem limites maiores.</p></details>
+<details class="faq"><summary>Como guardo o currículo em PDF?</summary><p>No criador de currículos toca em «Guardar em PDF» e, na janela de impressão do telemóvel, escolhe «Guardar como PDF».</p></details>
+<details class="faq"><summary>Como apago a minha conta?</summary><p>Contacta o suporte pelos meios acima a partir do email da conta.</p></details>
+<p class="small muted" style="margin-top:36px">Última atualização: novembro de 2026.</p></main>
+<footer class="site-footer"><div class="container"><span>© FLORA AI</span><nav><a href="termos.html">Termos</a><a href="privacidade.html">Privacidade</a><a href="ajuda.html">Ajuda e contacto</a></nav></div></footer>
+<script type="module">
+import { initSupabase, getClient, el, $ } from './assets/js/core.js';
+const box = $('#contact');
+const c = await initSupabase();
+if (c) {
+  const { data } = await c.from('settings').select('key,value').in('key', ['support_email','support_whatsapp']);
+  const s = Object.fromEntries((data||[]).map(r => [r.key, r.value]));
+  const items = [];
+  if (s.support_email) items.push(el('p', {}, 'Email: ', el('a', { href: 'mailto:' + s.support_email, text: s.support_email })));
+  if (s.support_whatsapp) items.push(el('p', {}, 'WhatsApp: ', el('a', { target: '_blank', rel: 'noopener', href: 'https://wa.me/' + String(s.support_whatsapp).replace(/\D/g,''), text: s.support_whatsapp })));
+  box.replaceChildren(...(items.length ? items : [el('p', { class: 'muted', text: 'Os contactos de suporte serão publicados em breve.' })]));
+} else box.replaceChildren(el('p', { class: 'muted', text: 'Contactos indisponíveis de momento.' }));
+</script>
+</body></html>
