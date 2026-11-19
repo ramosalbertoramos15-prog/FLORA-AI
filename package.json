@@ -1,0 +1,7 @@
+{
+  "name": "flora-ai-mvp",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Protótipo FLORA AI: currículo PDF + ferramentas de IA para beta privada na Vercel",
+  "license": "UNLICENSED"
+}
