@@ -59,3 +59,37 @@ module.exports = async function handler(req, res) {
         max_tokens: plan.max_output_tokens || 700
       })
     }, 50000);
+    const result = await r.json().catch(() => ({}));
+    if (!r.ok) {
+      console.error('IA erro', P.name, r.status, JSON.stringify(result.error || result).slice(0, 200));
+      await releaseUsage(usageId);
+      if (r.status === 429) return send(res, 429, { error: 'O serviço de IA está ocupado. Tenta novamente daqui a instantes.', code: 'upstream' });
+      return send(res, 502, { error: 'A IA não conseguiu responder agora. Tenta novamente.', code: 'upstream' });
+    }
+    const text = String(result.choices?.[0]?.message?.content || '').trim();
+    if (!text) { await releaseUsage(usageId); return send(res, 502, { error: 'A IA respondeu sem texto. Tenta novamente.' }); }
+    out = { text, tin: result.usage?.prompt_tokens || 0, tout: result.usage?.completion_tokens || 0 };
+  } catch (e) {
+    await releaseUsage(usageId);
+    return send(res, e.name === 'AbortError' ? 504 : 502, { error: 'Falha na ligação ao serviço de IA. Tenta novamente.' });
+  }
+  await finishUsage(usageId, out.tin, out.tout);
+
+  let msg = { id: null, role: 'assistant', kind: 'text', content: out.text, created_at: new Date().toISOString() };
+  if (persist) {
+    if (!conv) {
+      const title = message.replace(/\s+/g, ' ').slice(0, 60);
+      const cr = await db('conversations', { method: 'POST', body: { user_id: user.id, title, tool: activeTool }, prefer: 'return=representation' });
+      conv = cr.ok ? cr.data?.[0] : null;
+    }
+    if (conv) {
+      const ins = await db('messages', { method: 'POST', prefer: 'return=representation', body: [
+        { conversation_id: conv.id, user_id: user.id, role: 'user', content: message, created_at: new Date(Date.now() - 1000).toISOString() },
+        { conversation_id: conv.id, user_id: user.id, role: 'assistant', content: out.text }
+      ] });
+      if (ins.ok && ins.data?.[1]) msg = ins.data[1];
+      await db(`conversations?id=eq.${enc(conv.id)}`, { method: 'PATCH', body: { updated_at: new Date().toISOString() } });
+    }
+  }
+  return send(res, 200, { conversation_id: conv ? conv.id : null, title: conv?.title || null, message: msg, usage: { used: q.used + 1, limit: q.limit } });
+};
