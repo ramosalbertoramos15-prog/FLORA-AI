@@ -49,48 +49,13 @@ module.exports = async function handler(req, res) {
   const c = cfg();
   let out;
   try {
-    const r = await timedFetch(`${c.openaiBase}/responses`, {
+    const P = c.text;
+    const r = await timedFetch(`${P.base}/chat/completions`, {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${c.openai}` },
+      headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${P.key}` },
       body: JSON.stringify({
-        model: process.env.OPENAI_MODEL || 'gpt-4.1-mini',
-        instructions: TOOLS[activeTool],
-        input: [...history, { role: 'user', content: message }],
-        max_output_tokens: plan.max_output_tokens || 700,
-        store: false
+        model: P.model,
+        messages: [{ role: 'system', content: TOOLS[activeTool] }, ...history, { role: 'user', content: message }],
+        max_tokens: plan.max_output_tokens || 700
       })
     }, 50000);
-    const result = await r.json().catch(() => ({}));
-    if (!r.ok) {
-      console.error('OpenAI erro', r.status, result.error?.type || 'desconhecido');
-      await releaseUsage(usageId);
-      if (r.status === 429) return send(res, 429, { error: 'O serviço de IA está ocupado. Tenta novamente daqui a instantes.', code: 'upstream' });
-      return send(res, 502, { error: 'A IA não conseguiu responder agora. Tenta novamente.', code: 'upstream' });
-    }
-    const text = (result.output || []).flatMap(i => i.content || []).filter(p => p.type === 'output_text').map(p => p.text || '').join('\n').trim();
-    if (!text) { await releaseUsage(usageId); return send(res, 502, { error: 'A IA respondeu sem texto. Tenta novamente.' }); }
-    out = { text, tin: result.usage?.input_tokens || 0, tout: result.usage?.output_tokens || 0 };
-  } catch (e) {
-    await releaseUsage(usageId);
-    return send(res, e.name === 'AbortError' ? 504 : 502, { error: 'Falha na ligação ao serviço de IA. Tenta novamente.' });
-  }
-  await finishUsage(usageId, out.tin, out.tout);
-
-  let msg = { id: null, role: 'assistant', kind: 'text', content: out.text, created_at: new Date().toISOString() };
-  if (persist) {
-    if (!conv) {
-      const title = message.replace(/\s+/g, ' ').slice(0, 60);
-      const cr = await db('conversations', { method: 'POST', body: { user_id: user.id, title, tool: activeTool }, prefer: 'return=representation' });
-      conv = cr.ok ? cr.data?.[0] : null;
-    }
-    if (conv) {
-      const ins = await db('messages', { method: 'POST', prefer: 'return=representation', body: [
-        { conversation_id: conv.id, user_id: user.id, role: 'user', content: message, created_at: new Date(Date.now() - 1000).toISOString() },
-        { conversation_id: conv.id, user_id: user.id, role: 'assistant', content: out.text }
-      ] });
-      if (ins.ok && ins.data?.[1]) msg = ins.data[1];
-      await db(`conversations?id=eq.${enc(conv.id)}`, { method: 'PATCH', body: { updated_at: new Date().toISOString() } });
-    }
-  }
-  return send(res, 200, { conversation_id: conv ? conv.id : null, title: conv?.title || null, message: msg, usage: { used: q.used + 1, limit: q.limit } });
-};
