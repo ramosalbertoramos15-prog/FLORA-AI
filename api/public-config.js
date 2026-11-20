@@ -15,6 +15,6 @@ module.exports = function handler(req, res) {
     url: c.url,
     publishableKey: c.publishable,
     // Estado (sem valores secretos) para o painel de diagnóstico.
-    server: { ai: Boolean(c.openai), admin: Boolean(c.secret) }
+    server: { ai: Boolean(c.text.key), image: Boolean(c.openai), provider: c.text.key ? c.text.name : null, admin: Boolean(c.secret) }
   });
 };
