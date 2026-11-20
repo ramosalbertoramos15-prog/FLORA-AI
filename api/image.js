@@ -6,7 +6,7 @@ const { send, methodGuard, parseBody, requireUser, effectivePlanId, getPlan, get
 
 module.exports = async function handler(req, res) {
   if (!methodGuard(req, res, ['POST'])) return;
-  if (!core.isConfigured({ needAI: true })) return send(res, 503, { error: 'A geração de imagens ainda não está configurada no servidor.', code: 'not_configured' });
+  if (!core.isConfigured({ needAI: 'image' })) return send(res, 503, { error: 'A geração de imagens ainda não está disponível. Usa o chat de texto.', code: 'not_configured' });
   const ctx = await requireUser(req, res);
   if (!ctx) return;
   const { user, profile } = ctx;
@@ -59,28 +59,3 @@ module.exports = async function handler(req, res) {
   let up;
   try {
     up = await timedFetch(`${c.url}/storage/v1/object/generated-images/${path}`, {
-      method: 'POST', headers: serviceHeaders({ 'Content-Type': 'image/jpeg', 'x-upsert': 'false' }), body: buffer
-    }, 20000);
-  } catch { up = null; }
-  if (!up || !up.ok) {
-    console.error('Storage erro', up?.status);
-    await releaseUsage(usageId);
-    return send(res, 502, { error: 'A imagem foi criada mas não foi possível guardá-la. Confirma a migração SQL (bucket generated-images).', code: 'storage' });
-  }
-  await finishUsage(usageId, 0, 0);
-
-  if (!conv) {
-    const cr = await db('conversations', { method: 'POST', prefer: 'return=representation', body: { user_id: user.id, title: ('🎨 ' + prompt).slice(0, 60), tool: 'chat' } });
-    conv = cr.ok ? cr.data?.[0] : null;
-  }
-  let msg = { id: null, role: 'assistant', kind: 'image', content: prompt, image_path: path, created_at: new Date().toISOString() };
-  if (conv) {
-    const ins = await db('messages', { method: 'POST', prefer: 'return=representation', body: [
-      { conversation_id: conv.id, user_id: user.id, role: 'user', content: '🎨 ' + prompt, created_at: new Date(Date.now() - 1000).toISOString() },
-      { conversation_id: conv.id, user_id: user.id, role: 'assistant', kind: 'image', content: prompt, image_path: path }
-    ] });
-    if (ins.ok && ins.data?.[1]) msg = ins.data[1];
-    await db(`conversations?id=eq.${enc(conv.id)}`, { method: 'PATCH', body: { updated_at: new Date().toISOString() } });
-  }
-  return send(res, 200, { conversation_id: conv ? conv.id : null, title: conv?.title || null, message: msg, usage: { used: q.used + 1, limit: q.limit } });
-};
